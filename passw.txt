@@ -1,0 +1,113 @@
+package can;
+import java.util.Scanner;
+public class PasswordManager {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("请输入密码：");
+        String password = scanner.nextLine();
+
+        System.out.println("请选择操作：");
+        System.out.println("1.加密密码");
+        System.out.println("2.解密密码");
+        System.out.println("3.判断密码强度");
+        int choice = scanner.nextInt();
+
+        switch (choice) {
+            case 1:
+                String encryptedPassword = encryptPassword(password);
+                System.out.println("加密后的密码：" + encryptedPassword);
+                break;
+            case 2:
+                String decryptedPassword = decryptPassword(password);
+                System.out.println("解密后的密码：" + decryptedPassword);
+                break;
+            case 3:
+                String strength = checkPasswordStrength(password);
+                System.out.println("密码强度：" + strength);
+                break;
+            default:
+                System.out.println("无效的选择");
+        }
+
+        scanner.close();
+    }
+
+    public static String encryptPassword(String password) {
+        StringBuilder encryptedPassword = new StringBuilder();
+
+        // 遍历每个字符
+        for (int i = 0; i < password.length(); i++) {
+            char c = password.charAt(i);
+            // 将字符的ASCII码加上它在字符串中的位置和偏移值3
+            char encryptedChar = (char) (c + i + 3);
+            encryptedPassword.append(encryptedChar);
+        }
+
+        // 调换第一位和最后一位的顺序
+        if (encryptedPassword.length() > 1) {
+            char firstChar = encryptedPassword.charAt(0);
+            char lastChar = encryptedPassword.charAt(encryptedPassword.length() - 1);
+            encryptedPassword.setCharAt(0, lastChar);
+            encryptedPassword.setCharAt(encryptedPassword.length() - 1, firstChar);
+        }
+
+        // 反转字符串
+        encryptedPassword.reverse();
+
+        return encryptedPassword.toString();
+    }
+
+    public static String decryptPassword(String encryptedPassword) {
+        StringBuilder decryptedPassword = new StringBuilder(encryptedPassword);
+
+        // 反转字符串
+        decryptedPassword.reverse();
+
+        // 调换第一位和最后一位的顺序
+        if (decryptedPassword.length() > 1) {
+            char firstChar = decryptedPassword.charAt(0);
+            char lastChar = decryptedPassword.charAt(decryptedPassword.length() - 1);
+            decryptedPassword.setCharAt(0, lastChar);
+            decryptedPassword.setCharAt(decryptedPassword.length() - 1, firstChar);
+        }
+
+        // 遍历每个字符
+        for (int i = 0; i < decryptedPassword.length(); i++) {
+            char c = decryptedPassword.charAt(i);
+            // 将字符的ASCII码减去它在字符串中的位置和偏移值3
+            char decryptedChar = (char) (c - i - 3);
+            decryptedPassword.setCharAt(i, decryptedChar);
+        }
+
+        return decryptedPassword.toString();
+    }
+
+    public static String checkPasswordStrength(String password) {
+        int length = password.length();
+        boolean hasDigit = false;
+        boolean hasLowerCase = false;
+        boolean hasUpperCase = false;
+
+        // 遍历每个字符
+        for (int i = 0; i < length; i++) {
+            char c = password.charAt(i);
+            if (Character.isDigit(c)) {
+                hasDigit = true;
+            } else if (Character.isLowerCase(c)) {
+                hasLowerCase = true;
+            } else if (Character.isUpperCase(c)) {
+                hasUpperCase = true;
+            }
+        }
+
+        if (length < 8 || (hasDigit && !hasLowerCase && !hasUpperCase)) {
+            return "弱强度";
+        } else if (hasDigit && (hasLowerCase || hasUpperCase)) {
+            return "中强度";
+        } else if (hasDigit && hasLowerCase && hasUpperCase) {
+            return "高强度";
+        } else {
+            return "未知强度";
+        }
+    }
+}
